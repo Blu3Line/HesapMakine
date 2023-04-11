@@ -15,7 +15,7 @@ namespace HesapMakine
     {
         double sayi1, sayi2;
         string Operator;
-        bool ilkrakam;
+        bool TextBoxSayıBulunduruyorMu;
         public Form1()
         {
             InitializeComponent();
@@ -32,26 +32,21 @@ namespace HesapMakine
             }
             textBox1.BackColor = tableLayoutPanel1.BackColor;//textboxun arka planı panel layout ile aynı olsun
             textBox1.Text = "0";
-            ilkrakam = true;
+            TextBoxSayıBulunduruyorMu = false;
         }
 
-
-        private void Form1_Resize(object sender, EventArgs e)//form resizeable olayını yapmaya çalıştım ama bozuk
-        {
-            this.ClientSize = new Size(430, 750);//TODO: burası hardcoded sonra dinamik olsun 
-        }
 
         private void NumberButtonClick(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
             string rakamText = btn.Text;
-            if(btn.Text == "0"  && ilkrakam) {//0 ile sayılar başlanmasın TODO: potansiyel bug olabilir
-                
+            if(btn.Text == "0"  && !TextBoxSayıBulunduruyorMu) {//0 tuşuna basıp başka bir tuşa basınca execute olur ve ignorelar.
+                return;
             }
-            else if (ilkrakam)
+            else if (!TextBoxSayıBulunduruyorMu)
             {
                 textBox1.Text = rakamText;
-                ilkrakam = false;
+                TextBoxSayıBulunduruyorMu = true;
             }
             else
             {
@@ -62,12 +57,12 @@ namespace HesapMakine
 
         private void OperatorButtonClick(object sender, EventArgs e)
         {
-            //TODO: operatore direkt basılmasın fixle potansiyel bug olabilir.
-            
-            Button btn = (Button)(sender);
-            sayi1 = Convert.ToDouble(textBox1.Text);
-            Operator = btn.Text;
-            ilkrakam = true;
+            if (TextBoxSayıBulunduruyorMu) {//
+                Button btn = (Button)(sender);
+                sayi1 = Convert.ToDouble(textBox1.Text);
+                Operator = btn.Text;
+                TextBoxSayıBulunduruyorMu = false;
+            }
         }
 
         private void EsittirButtonClick(object sender, EventArgs e)//bürsürü bug var
@@ -92,17 +87,18 @@ namespace HesapMakine
                     break;
             }
             textBox1.Text = sonuc.ToString();
-            ilkrakam = true;
+            TextBoxSayıBulunduruyorMu = true;
         }
 
         private void ClearButtonClick(object sender, EventArgs e)
         {
             textBox1.Text = "0";
             Operator = "";
-            ilkrakam = true;
+            TextBoxSayıBulunduruyorMu = false;
+            sayi1 = 0; sayi2 = 0;//sayılar temizlensin.
         }
 
-        private void DelButtonClick(object sender, EventArgs e)//bunu test etmedin.
+        private void DelButtonClick(object sender, EventArgs e)
         {
             if(textBox1.Text != "0" && textBox1.Text.Length > 1)
             {
@@ -111,7 +107,7 @@ namespace HesapMakine
             else
             {
                 textBox1.Text = "0";
-                ilkrakam = true;
+                TextBoxSayıBulunduruyorMu = false;
             }
 
         }
@@ -121,6 +117,7 @@ namespace HesapMakine
             if (!textBox1.Text.Contains("."))//zaten nokta olmasın
             {
                 textBox1.Text += ".";
+                TextBoxSayıBulunduruyorMu = true;
             }
 
         }
